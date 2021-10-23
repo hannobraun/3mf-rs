@@ -15,3 +15,13 @@ Adding support for reading 3MF files, and for more features of the 3MF format is
 Functionality is limited, but what is currently there seems to work well. This library is used by (and has been extracted from) [Fornjot].
 
 [Fornjot]: https://github.com/hannobraun/fornjot
+
+
+## License
+
+This project is open source software, licensed under the terms of the [Zero Clause BSD License] (0BSD, for short). This basically means you can do anything with the software, without any restrictions, but you can't hold the authors liable for problems.
+
+See [LICENSE.md] for all details.
+
+[Zero Clause BSD License]: https://opensource.org/licenses/0BSD
+[LICENSE.md]: https://github.com/hannobraun/3mf-rs/blob/main/LICENSE.md
