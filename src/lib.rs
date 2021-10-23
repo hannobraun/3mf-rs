@@ -1,4 +1,4 @@
-//! Support for 3MF (3D Manufacturing Format) for the Rust programming language
+//! 3MF (3D Manufacturing Format) support for Rust
 //!
 //! This library provides support for 3MF files to programs written in the Rust
 //! programming language. So far, functionality is limited to writing 3MF files,
