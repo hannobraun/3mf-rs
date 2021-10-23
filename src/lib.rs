@@ -1,4 +1,4 @@
-//! 3MF (3D Manufacturing Format) support for Rust
+//! # 3MF (3D Manufacturing Format) support for Rust
 //!
 //! This library provides support for [3MF] files to programs written in the
 //! Rust programming language. 3MF is a file format commonly used for 3D
@@ -10,7 +10,8 @@
 //! and for more features of the 3MF format is very desirable, and any
 //! contributions toward that are very welcome.
 //!
-//! # Further Reading
+//!
+//! ## Further Reading
 //!
 //! See [3MF specification] and [Open Packaging Conventions].
 //!
