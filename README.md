@@ -2,10 +2,9 @@
 
 ## About
 
-This library provides support for [3MF] files to programs written in the Rust programming language. So far, functionality is limited to writing 3MF files, and only the most basic features of 3MF are supported.
+This library provides support for [3MF] files to programs written in the Rust programming language. 3MF is a file format commonly used for 3D printing. It is typically exported from a CAD program, and imported to a slicer.
 
-Adding support for reading 3MF files, and for more features of the 3MF format is very desirable, and any contributions toward that are very welcome.
-
+So far, functionality is limited to writing 3MF files, and only the most basic features of 3MF are supported. Adding support for reading 3MF files, and for more features of the 3MF format is very desirable, and any contributions toward that are very welcome.
 
 [3MF]: https://en.wikipedia.org/wiki/3D_Manufacturing_Format
 
