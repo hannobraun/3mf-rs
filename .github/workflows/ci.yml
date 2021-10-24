@@ -22,7 +22,13 @@ jobs:
       with:
         profile: minimal
         toolchain: stable
+        components: rustfmt
     - name: Run `cargo check`
       uses: actions-rs/cargo@v1
       with:
         command: check
+    - name: Check formatting
+      uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: -- --check
