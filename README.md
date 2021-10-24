@@ -1,4 +1,4 @@
-# 3MF (3D Manufacturing Format) support for Rust [![CI](https://github.com/hannobraun/3mf-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/hannobraun/3mf-rs/actions/workflows/ci.yml)
+# 3MF (3D Manufacturing Format) support for Rust [![crates.io](https://img.shields.io/crates/v/threemf.svg)](https://crates.io/crates/threemf) [![CI](https://github.com/hannobraun/3mf-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/hannobraun/3mf-rs/actions/workflows/ci.yml)
 
 ## About
 
