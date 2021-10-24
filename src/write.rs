@@ -8,7 +8,7 @@ use thiserror::Error;
 
 use zip::{result::ZipError, write::FileOptions, ZipWriter};
 
-use super::TriangleMesh;
+use crate::TriangleMesh;
 
 /// Write a triangle mesh to a 3MF file
 pub fn write(path: PathBuf, mesh: &TriangleMesh) -> Result<(), Error> {
