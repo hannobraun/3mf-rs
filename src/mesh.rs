@@ -24,7 +24,7 @@ pub struct TriangleMesh {
 /// A vertex in a triangle mesh
 ///
 /// See [`TriangleMesh`].
-pub type Vertex = [f32; 3];
+pub type Vertex = [f64; 3];
 
 /// A triangle in a triangle mesh
 ///
