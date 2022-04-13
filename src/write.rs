@@ -1,7 +1,7 @@
 use std::{
     fs::File,
     io::{self, prelude::*},
-    path::PathBuf,
+    path::Path,
 };
 
 use thiserror::Error;
@@ -11,8 +11,8 @@ use zip::{result::ZipError, write::FileOptions, ZipWriter};
 use crate::TriangleMesh;
 
 /// Write a triangle mesh to a 3MF file
-pub fn write(path: PathBuf, mesh: &TriangleMesh) -> Result<(), Error> {
-    let file = File::create(&path)?;
+pub fn write(path: &Path, mesh: &TriangleMesh) -> Result<(), Error> {
+    let file = File::create(path)?;
     let mut archive = ZipWriter::new(file);
 
     archive.start_file("[Content_Types].xml", FileOptions::default())?;
