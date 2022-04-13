@@ -23,4 +23,7 @@
 pub mod mesh;
 pub mod write;
 
-pub use self::{mesh::TriangleMesh, write::write};
+pub use self::{
+    mesh::TriangleMesh,
+    write::{write, Error},
+};
