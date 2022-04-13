@@ -1,20 +1,20 @@
 [package]
-name    = "threemf"
-version = "0.2.0"
+name = "threemf"
+version = "0.3.0"
 
-edition      = "2021"
+edition = "2021"
 rust-version = "1.56"
 
-authors     = ["Hanno Braun <hanno@braun-odw.eu>"]
+authors = ["Hanno Braun <hanno@braun-odw.eu>"]
 description = "3MF (3D Manufacturing Format) file format support"
-license     = "0BSD"
-keywords    = ["3MF", "CAD", "slicer", "triangle", "mesh"]
-categories  = ["encoding", "rendering::data-formats"]
+license = "0BSD"
+keywords = ["3MF", "CAD", "slicer", "triangle", "mesh"]
+categories = ["encoding", "rendering::data-formats"]
 
-readme     = "README.md"
+readme = "README.md"
 repository = "https://github.com/hannobraun/3mf-rs"
 
 
 [dependencies]
 thiserror = "1.0.30"
-zip       = "0.5.13"
+zip = "0.5.13"
