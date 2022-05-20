@@ -14,11 +14,6 @@ categories = ["encoding", "rendering::data-formats"]
 readme = "README.md"
 repository = "https://github.com/hannobraun/3mf-rs"
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-zip = { version = "0.5.13", default-features = false, features = ["deflate"] }
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-zip = "0.5.13"
-
 [dependencies]
 thiserror = "1.0.30"
+zip = { version = "0.5.13", default-features = false }
