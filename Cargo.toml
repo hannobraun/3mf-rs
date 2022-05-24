@@ -16,7 +16,7 @@ repository = "https://github.com/hannobraun/3mf-rs"
 
 
 [dependencies]
-thiserror = "1.0.30"
+thiserror = "1.0.31"
 
 [dependencies.zip]
 version = "0.5.13"
