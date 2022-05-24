@@ -14,6 +14,11 @@ categories = ["encoding", "rendering::data-formats"]
 readme = "README.md"
 repository = "https://github.com/hannobraun/3mf-rs"
 
+
 [dependencies]
-thiserror = "1.0.30"
-zip = { version = "0.5.13", default-features = false, features = ["deflate"] }
+thiserror = "1.0.31"
+
+[dependencies.zip]
+version = "0.6.2"
+default-features = false
+features = ["deflate"]
