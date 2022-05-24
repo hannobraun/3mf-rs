@@ -19,6 +19,6 @@ repository = "https://github.com/hannobraun/3mf-rs"
 thiserror = "1.0.31"
 
 [dependencies.zip]
-version = "0.5.13"
+version = "0.6.2"
 default-features = false
 features = ["deflate"]
