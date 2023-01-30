@@ -20,7 +20,7 @@
 //! [3MF specification]: https://3mf.io/specification/
 //! [Open Packaging Conventions]: https://standards.iso.org/ittf/PubliclyAvailableStandards/c061796_ISO_IEC_29500-2_2012.zip
 
-pub mod mesh;
+pub mod error;
 pub mod write;
 
 pub use self::{

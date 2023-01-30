@@ -4,9 +4,9 @@ use std::{
     path::Path,
 };
 
-use thiserror::Error;
+use crate::Error;
 
-use zip::{result::ZipError, write::FileOptions, ZipWriter};
+use zip::{write::FileOptions, ZipWriter};
 
 use crate::TriangleMesh;
 
@@ -55,16 +55,4 @@ fn write_mesh(mut sink: impl Write, mesh: &TriangleMesh) -> io::Result<()> {
     sink.write_all(include_bytes!("model-footer.xml"))?;
 
     Ok(())
-}
-
-/// An error that can occur while writing a 3MF file
-#[derive(Debug, Error)]
-pub enum Error {
-    /// I/O error while writing 3MF file
-    #[error("I/O error while exporting to 3MF file")]
-    Io(#[from] io::Error),
-
-    /// Error writing ZIP file (3MF files are ZIP files)
-    #[error("Error writing ZIP file (3MF files are ZIP files)")]
-    Zip(#[from] ZipError),
 }
