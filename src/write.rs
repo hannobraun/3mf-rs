@@ -4,14 +4,23 @@ use std::{
     path::Path,
 };
 
-use thiserror::Error;
+use crate::Error;
+use quick_xml::{
+    events::{BytesDecl, Event},
+    se::Serializer,
+    Writer,
+};
+use serde::Serialize;
 
-use zip::{result::ZipError, write::FileOptions, ZipWriter};
+use zip::{write::FileOptions, ZipWriter};
 
-use crate::TriangleMesh;
+use crate::{
+    model::{Build, Item, Model, Object, ObjectData, Resources},
+    Mesh,
+};
 
 /// Write a triangle mesh to a 3MF file
-pub fn write(path: &Path, mesh: &TriangleMesh) -> Result<(), Error> {
+pub fn write(path: &Path, mesh: Mesh) -> Result<(), Error> {
     let file = File::create(path)?;
     let mut archive = ZipWriter::new(file);
 
@@ -29,42 +38,40 @@ pub fn write(path: &Path, mesh: &TriangleMesh) -> Result<(), Error> {
     Ok(())
 }
 
-fn write_mesh(mut sink: impl Write, mesh: &TriangleMesh) -> io::Result<()> {
-    sink.write_all(include_bytes!("model-header.xml"))?;
+fn write_mesh(sink: impl Write, mesh: Mesh) -> Result<(), Error> {
+    let object = Object {
+        id: 1,
+        partnumber: None,
+        name: None,
+        pid: None,
+        object: ObjectData::Mesh(mesh),
+    };
+    let resources = Resources {
+        object: vec![object],
+        basematerials: None,
+    };
+    let build = Build {
+        item: vec![Item {
+            objectid: 1,
+            transform: None,
+            partnumber: None,
+        }],
+    };
+    let model = Model {
+        resources,
+        build,
+        ..Default::default()
+    };
 
-    writeln!(sink, "\t\t\t\t<vertices>")?;
-    for vertex in &mesh.vertices {
-        writeln!(
-            sink,
-            "\t\t\t\t\t<vertex x=\"{}\" y=\"{}\" z=\"{}\" />",
-            vertex[0], vertex[1], vertex[2],
-        )?;
-    }
-    writeln!(sink, "\t\t\t\t</vertices>")?;
+    let mut ser = Serializer::with_root(String::new(), Some("model"))?;
+    ser.indent(' ', 2);
 
-    writeln!(sink, "\t\t\t\t<triangles>")?;
-    for [i1, i2, i3] in &mesh.triangles {
-        writeln!(
-            sink,
-            "\t\t\t\t\t<triangle v1=\"{}\" v2=\"{}\" v3=\"{}\" />",
-            i1, i2, i3,
-        )?;
-    }
-    writeln!(sink, "\t\t\t\t</triangles>")?;
-
-    sink.write_all(include_bytes!("model-footer.xml"))?;
+    let mut xml_writer = Writer::new_with_indent(sink, b' ', 2);
+    xml_writer.write_event(Event::Decl(BytesDecl::new("1.0", Some("utf-8"), None)))?;
+    xml_writer.write_indent()?;
+    xml_writer
+        .inner()
+        .write_all(model.serialize(ser).unwrap().as_bytes())?;
 
     Ok(())
-}
-
-/// An error that can occur while writing a 3MF file
-#[derive(Debug, Error)]
-pub enum Error {
-    /// I/O error while writing 3MF file
-    #[error("I/O error while exporting to 3MF file")]
-    Io(#[from] io::Error),
-
-    /// Error writing ZIP file (3MF files are ZIP files)
-    #[error("Error writing ZIP file (3MF files are ZIP files)")]
-    Zip(#[from] ZipError),
 }
