@@ -1,8 +1,4 @@
-use std::{
-    fs::File,
-    io::{self, prelude::*},
-    path::Path,
-};
+use std::{fs::File, io::prelude::*, path::Path};
 
 use crate::Error;
 use quick_xml::{
