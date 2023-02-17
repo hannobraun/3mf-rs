@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.0 (2022-02-17)
+
+- Switch to Serde for writing XML ([#22])
+
+[#22]: https://github.com/hannobraun/3mf-rs/pull/22
+
+
 ## v0.3.1 (2022-05-24)
 
 - Remove unused bzip2 dependency ([#12], [#13])
