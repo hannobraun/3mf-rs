@@ -18,6 +18,6 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v3
     - name: Run `cargo clippy`
-      run: cargo clippy --all-features
+      run: cargo clippy --all-features -- -D warnings
     - name: Check formatting
       run: cargo fmt -- --check
