@@ -1,9 +1,12 @@
 use model::{Triangle, Triangles, Vertex, Vertices};
 use std::path::Path;
-use threemf::{model, Mesh};
+use threemf::{
+    model::{self, ObjectData},
+    Mesh,
+};
 
 #[test]
-fn test_write() {
+fn roundtrip() {
     let vertices = Vertices {
         vertex: vec![
             Vertex {
@@ -37,5 +40,12 @@ fn test_write() {
         vertices,
     };
 
+    let write_mesh = mesh.clone();
+
     threemf::write(Path::new("triangle.3mf"), mesh).expect("Error writing mesh");
+    let models = threemf::read(Path::new("triangle.3mf")).expect("Error reading model");
+
+    if let ObjectData::Mesh(read_mesh) = &models[0].resources.object[0].object {
+        assert!(read_mesh == &write_mesh);
+    }
 }
