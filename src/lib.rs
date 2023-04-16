@@ -22,6 +22,7 @@
 
 pub mod error;
 pub mod model;
+pub mod read;
 pub mod write;
 
-pub use self::{error::Error, model::Mesh, write::write};
+pub use self::{error::Error, model::Mesh, read::read, write::write};
