@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 /// mesh type is out of scope for this library. It is expected that users of
 /// this library will use their own mesh type anyway, and the simplicity of
 /// `TriangleMesh` provides an easy target for conversion from such a type.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct Mesh {
     /// The vertices of the mesh
     ///
@@ -25,21 +25,21 @@ pub struct Mesh {
 }
 
 /// A list of vertices, as a struct mainly to comply with easier serde xml
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct Vertices {
     #[serde(default)]
     pub vertex: Vec<Vertex>,
 }
 
 /// A list of triangles, as a struct mainly to comply with easier serde xml
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct Triangles {
     #[serde(default)]
     pub triangle: Vec<Triangle>,
 }
 
 /// A vertex in a triangle mesh
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct Vertex {
     #[serde(rename = "@x")]
     pub x: f64,
@@ -53,7 +53,7 @@ pub struct Vertex {
 ///
 /// The triangle consists of indices that refer to the vertices of the mesh. See
 /// [`TriangleMesh`].
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct Triangle {
     #[serde(rename = "@v1")]
     pub v1: usize,
