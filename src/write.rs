@@ -24,15 +24,16 @@ pub fn write<W: Write + io::Seek, M: Into<Model>>(writer: W, model: M) -> Result
 
     archive.start_file("3D/model.model", FileOptions::default())?;
 
-    let mut ser = Serializer::with_root(String::new(), Some("model"))?;
+    let mut xml = String::new();
+
+    let mut ser = Serializer::with_root(&mut xml, Some("model"))?;
     ser.indent(' ', 2);
+    model.into().serialize(ser)?;
 
     let mut xml_writer = Writer::new_with_indent(&mut archive, b' ', 2);
     xml_writer.write_event(Event::Decl(BytesDecl::new("1.0", Some("utf-8"), None)))?;
     xml_writer.write_indent()?;
-    xml_writer
-        .inner()
-        .write_all(model.into().serialize(ser).unwrap().as_bytes())?;
+    xml_writer.into_inner().write_all(xml.as_bytes())?;
 
     archive.finish()?;
 
