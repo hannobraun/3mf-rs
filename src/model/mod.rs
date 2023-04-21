@@ -106,3 +106,31 @@ impl Default for Unit {
         Self::Millimeter
     }
 }
+
+impl From<Mesh> for Model {
+    fn from(mesh: Mesh) -> Self {
+        let object = Object {
+            id: 1,
+            partnumber: None,
+            name: None,
+            pid: None,
+            object: ObjectData::Mesh(mesh),
+        };
+        let resources = Resources {
+            object: vec![object],
+            basematerials: None,
+        };
+        let build = Build {
+            item: vec![Item {
+                objectid: 1,
+                transform: None,
+                partnumber: None,
+            }],
+        };
+        Model {
+            resources,
+            build,
+            ..Default::default()
+        }
+    }
+}
