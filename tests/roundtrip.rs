@@ -1,5 +1,5 @@
 use model::{Triangle, Triangles, Vertex, Vertices};
-use std::path::Path;
+use std::io::Cursor;
 use threemf::{
     model::{self, ObjectData},
     Mesh,
@@ -42,8 +42,10 @@ fn roundtrip() {
 
     let write_mesh = mesh.clone();
 
-    threemf::write(Path::new("triangle.3mf"), mesh).expect("Error writing mesh");
-    let models = threemf::read(Path::new("triangle.3mf")).expect("Error reading model");
+    let mut buf = Cursor::new(Vec::new());
+
+    threemf::write(&mut buf, mesh).expect("Error writing mesh");
+    let models = threemf::read(&mut buf).expect("Error reading model");
 
     if let ObjectData::Mesh(read_mesh) = &models[0].resources.object[0].object {
         assert!(read_mesh == &write_mesh);

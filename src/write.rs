@@ -1,4 +1,4 @@
-use std::{fs::File, io::prelude::*, path::Path};
+use std::io::{self, prelude::*};
 
 use crate::Error;
 use quick_xml::{
@@ -15,10 +15,9 @@ use crate::{
     Mesh,
 };
 
-/// Write a triangle mesh to a 3MF file
-pub fn write(path: &Path, mesh: Mesh) -> Result<(), Error> {
-    let file = File::create(path)?;
-    let mut archive = ZipWriter::new(file);
+/// Write a triangle mesh to a 3MF writer
+pub fn write<W: Write + io::Seek>(writer: W, mesh: Mesh) -> Result<(), Error> {
+    let mut archive = ZipWriter::new(writer);
 
     archive.start_file("[Content_Types].xml", FileOptions::default())?;
     archive.write_all(include_bytes!("content-types.xml"))?;
