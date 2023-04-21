@@ -8,8 +8,8 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[serde(rename = "@xmlns", default)]
     pub xmlns: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Metadata>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub metadata: Vec<Metadata>,
     pub resources: Resources,
     pub build: Build,
     #[serde(rename = "@unit", default)]
@@ -30,8 +30,10 @@ pub enum Unit {
 
 #[derive(Serialize, Deserialize)]
 pub struct Metadata {
-    #[serde(rename = "@name", skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
+    #[serde(rename = "@name")]
+    pub name: String,
+    #[serde(rename = "$value")]
+    pub value: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Default)]
@@ -91,7 +93,7 @@ impl Default for Model {
     fn default() -> Self {
         Self {
             xmlns: "http://schemas.microsoft.com/3dmanufacturing/core/2015/02".to_owned(),
-            metadata: Option::default(),
+            metadata: Vec::new(),
             resources: Resources::default(),
             build: Build::default(),
             unit: Unit::default(),
