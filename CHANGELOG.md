@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.5.0 (2024-02-14)
+
+- Add support for reading 3MF files ([#28], [#32])
+- Don't require actual files when reading/writing 3MF ([#31])
+- Accept `Into<Model>` in `write` ([#33])
+- Update dependencies ([#34], [#36], [#37], [#39])
+- Update README ([#40])
+
+[#28]: https://github.com/hannobraun/3mf-rs/pull/28
+[#31]: https://github.com/hannobraun/3mf-rs/pull/31
+[#32]: https://github.com/hannobraun/3mf-rs/pull/32
+[#33]: https://github.com/hannobraun/3mf-rs/pull/33
+[#34]: https://github.com/hannobraun/3mf-rs/pull/34
+[#36]: https://github.com/hannobraun/3mf-rs/pull/36
+[#37]: https://github.com/hannobraun/3mf-rs/pull/37
+[#39]: https://github.com/hannobraun/3mf-rs/pull/39
+[#40]: https://github.com/hannobraun/3mf-rs/pull/40
+
 ## v0.4.0 (2023-02-17)
 
 - Switch to Serde for writing XML ([#22])
