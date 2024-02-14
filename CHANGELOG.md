@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.4.0 (2022-02-17)
+## v0.4.0 (2023-02-17)
 
 - Switch to Serde for writing XML ([#22])
 
