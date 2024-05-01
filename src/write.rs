@@ -8,7 +8,7 @@ use quick_xml::{
 };
 use serde::Serialize;
 
-use zip::{write::FileOptions, ZipWriter};
+use zip::{write::SimpleFileOptions, ZipWriter};
 
 use crate::model::Model;
 
@@ -16,13 +16,13 @@ use crate::model::Model;
 pub fn write<W: Write + io::Seek, M: Into<Model>>(writer: W, model: M) -> Result<(), Error> {
     let mut archive = ZipWriter::new(writer);
 
-    archive.start_file("[Content_Types].xml", FileOptions::default())?;
+    archive.start_file("[Content_Types].xml", SimpleFileOptions::default())?;
     archive.write_all(include_bytes!("content-types.xml"))?;
 
-    archive.start_file("_rels/.rels", FileOptions::default())?;
+    archive.start_file("_rels/.rels", SimpleFileOptions::default())?;
     archive.write_all(include_bytes!("rels.xml"))?;
 
-    archive.start_file("3D/model.model", FileOptions::default())?;
+    archive.start_file("3D/model.model", SimpleFileOptions::default())?;
 
     let mut xml = String::new();
 
