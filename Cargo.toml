@@ -5,7 +5,6 @@ version = "0.5.0"
 edition = "2021"
 rust-version = "1.56"
 
-authors = ["Hanno Braun <hanno@braun-odw.eu>"]
 description = "3MF (3D Manufacturing Format) file format support"
 license = "0BSD"
 keywords = ["3MF", "CAD", "slicer", "triangle", "mesh"]
