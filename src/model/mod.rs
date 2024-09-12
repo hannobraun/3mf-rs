@@ -55,15 +55,17 @@ pub struct Object {
     pub name: Option<String>,
     #[serde(rename = "@pid", skip_serializing_if = "Option::is_none")]
     pub pid: Option<usize>,
-    #[serde(rename = "$value")]
-    pub object: ObjectData,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mesh: Option<Mesh>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub components: Option<Components>,
 }
 
 #[derive(Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum ObjectData {
-    Mesh(Mesh),
-    Components { component: Vec<Component> },
+pub struct Components {
+    pub component: Vec<Component>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -114,7 +116,8 @@ impl From<Mesh> for Model {
             partnumber: None,
             name: None,
             pid: None,
-            object: ObjectData::Mesh(mesh),
+            mesh: Some(mesh),
+            components: None,
         };
         let resources = Resources {
             object: vec![object],

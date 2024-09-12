@@ -1,9 +1,6 @@
 use model::{Triangle, Triangles, Vertex, Vertices};
 use std::io::Cursor;
-use threemf::{
-    model::{self, ObjectData},
-    Mesh,
-};
+use threemf::{model, Mesh};
 
 #[test]
 fn roundtrip() {
@@ -47,7 +44,7 @@ fn roundtrip() {
     threemf::write(&mut buf, mesh).expect("Error writing mesh");
     let models = threemf::read(&mut buf).expect("Error reading model");
 
-    if let ObjectData::Mesh(read_mesh) = &models[0].resources.object[0].object {
+    if let Some(read_mesh) = &models[0].resources.object[0].mesh {
         assert!(read_mesh == &write_mesh);
     }
 }
