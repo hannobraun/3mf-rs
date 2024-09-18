@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.6.0 (2024-09-18)
+
+- Update dependencies ([#46], [#48], [#49], [#50], [#51], [#52])
+- **Breaking change:** Fix crash when parsing `<metadatagroup>` ([#54])
+
+[#46]: https://github.com/hannobraun/3mf-rs/pull/46
+[#48]: https://github.com/hannobraun/3mf-rs/pull/48
+[#49]: https://github.com/hannobraun/3mf-rs/pull/49
+[#50]: https://github.com/hannobraun/3mf-rs/pull/50
+[#51]: https://github.com/hannobraun/3mf-rs/pull/51
+[#52]: https://github.com/hannobraun/3mf-rs/pull/52
+[#54]: https://github.com/hannobraun/3mf-rs/pull/54
+
 ## v0.5.0 (2024-02-14)
 
 - Add support for reading 3MF files ([#28], [#32])
