@@ -17,7 +17,7 @@ repository = "https://github.com/hannobraun/3mf-rs"
 [dependencies]
 quick-xml = { version = "0.36.0", features = ["serialize"] }
 serde = { version = "1.0.152", features = ["derive"] }
-thiserror = "1.0.31"
+thiserror = "2.0.3"
 
 [dependencies.zip]
 version = "2.1.0"
