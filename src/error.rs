@@ -12,11 +12,11 @@ pub enum Error {
     #[error("Error writing ZIP file (3MF files are ZIP files)")]
     Zip(#[from] ZipError),
 
-    /// Error reading/writing XML
-    #[error("Error reading/writing XML")]
-    XMLError(#[from] quick_xml::Error),
-
     /// Error Deserializing internal 3MF XML structure
     #[error("Deserialization error from xml reading")]
-    DeError(#[from] quick_xml::DeError),
+    XMLDe(#[from] quick_xml::DeError),
+
+    /// Error Serializing internal 3MF XML structure
+    #[error("Serialization error from xml writing")]
+    XMLSe(#[from] quick_xml::SeError),
 }
