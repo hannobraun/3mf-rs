@@ -14,9 +14,9 @@ pub enum Error {
 
     /// Error Deserializing internal 3MF XML structure
     #[error("Deserialization error from xml reading")]
-    DeError(#[from] quick_xml::DeError),
+    XMLDe(#[from] quick_xml::DeError),
 
     /// Error Serializing internal 3MF XML structure
     #[error("Serialization error from xml writing")]
-    SeError(#[from] quick_xml::SeError),
+    XMLSe(#[from] quick_xml::SeError),
 }
