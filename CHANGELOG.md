@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.7.0 (2025-01-31)
+
+- Update dependencies ([#58])
+- **Breaking change:** Upgrade to `quick-xml` 0.37 ([#61])
+
+[#58]: https://github.com/hannobraun/3mf-rs/pull/58
+[#61]: https://github.com/hannobraun/3mf-rs/pull/61
+
 ## v0.6.0 (2024-09-18)
 
 - Update dependencies ([#46], [#48], [#49], [#50], [#51], [#52])
