@@ -1,3 +1,4 @@
+use instant_xml::*;
 use serde::{Deserialize, Serialize};
 
 /// A triangle mesh
@@ -9,7 +10,7 @@ use serde::{Deserialize, Serialize};
 /// mesh type is out of scope for this library. It is expected that users of
 /// this library will use their own mesh type anyway, and the simplicity of
 /// `TriangleMesh` provides an easy target for conversion from such a type.
-#[derive(Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, FromXml, ToXml, PartialEq, Clone)]
 pub struct Mesh {
     /// The vertices of the mesh
     ///
@@ -25,27 +26,30 @@ pub struct Mesh {
 }
 
 /// A list of vertices, as a struct mainly to comply with easier serde xml
-#[derive(Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, FromXml, ToXml, PartialEq, Clone)]
 pub struct Vertices {
     #[serde(default)]
     pub vertex: Vec<Vertex>,
 }
 
 /// A list of triangles, as a struct mainly to comply with easier serde xml
-#[derive(Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, FromXml, ToXml, PartialEq, Clone)]
 pub struct Triangles {
     #[serde(default)]
     pub triangle: Vec<Triangle>,
 }
 
 /// A vertex in a triangle mesh
-#[derive(Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, FromXml, ToXml, PartialEq, Clone)]
 pub struct Vertex {
     #[serde(rename = "@x")]
+    #[xml(rename = "@x")]
     pub x: f64,
     #[serde(rename = "@y")]
+    #[xml(rename = "@y")]
     pub y: f64,
     #[serde(rename = "@z")]
+    #[xml(rename = "@z")]
     pub z: f64,
 }
 
@@ -53,12 +57,15 @@ pub struct Vertex {
 ///
 /// The triangle consists of indices that refer to the vertices of the mesh. See
 /// [`TriangleMesh`].
-#[derive(Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, FromXml, ToXml, PartialEq, Clone)]
 pub struct Triangle {
     #[serde(rename = "@v1")]
+    #[xml(rename = "@v1")]
     pub v1: usize,
     #[serde(rename = "@v2")]
+    #[xml(rename = "@v2")]
     pub v2: usize,
     #[serde(rename = "@v3")]
+    #[xml(rename = "@v3")]
     pub v3: usize,
 }

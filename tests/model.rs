@@ -11,7 +11,7 @@ fn test_object() {
             ..
         } => {
             assert_eq!(component.len(), 3);
-            let transform = component.first().unwrap().transform.unwrap();
+            let transform = component.first().unwrap().transform.as_ref().unwrap();
             assert_eq!(transform[0], 0.0393701);
         }
         _ => panic!("There should be components"),
