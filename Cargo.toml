@@ -16,7 +16,8 @@ repository = "https://github.com/hannobraun/3mf-rs"
 
 [dependencies]
 quick-xml = { version = "0.37.0", features = ["serialize"] }
-instant-xml = { version = "0.5.2" }
+instant-xml = { git = "https://github.com/djc/instant-xml.git", branch = "main" }
+#instant-xml = { version = "0.5.2" }
 instant-xml-macros = { version = "0.5.2" }
 serde = { version = "1.0.152", features = ["derive"] }
 thiserror = "2.0.3"
@@ -25,3 +26,7 @@ thiserror = "2.0.3"
 version = "2.1.0"
 default-features = false
 features = ["deflate"]
+
+[dev-dependencies]
+pretty_assertions = { version = "1.4.1" }
+collapse = { version = "0.1.2" }

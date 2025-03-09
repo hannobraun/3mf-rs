@@ -1,6 +1,6 @@
-use model::{Triangle, Triangles, Vertex, Vertices};
+use core::{Triangle, Triangles, Vertex, Vertices};
 use std::io::Cursor;
-use threemf::{model, Mesh};
+use threemf::{core, Mesh};
 
 #[test]
 fn roundtrip() {
@@ -29,6 +29,10 @@ fn roundtrip() {
             v1: 0,
             v2: 1,
             v3: 2,
+            p1: None,
+            p2: None,
+            p3: None,
+            pid: None,
         }],
     };
 

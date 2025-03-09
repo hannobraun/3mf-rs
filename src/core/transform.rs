@@ -5,7 +5,7 @@ use std::ops::Index;
 const MATRIX_SIZE: usize = 12;
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-pub struct Transform([f64; MATRIX_SIZE]);
+pub struct Transform(pub [f64; MATRIX_SIZE]);
 
 impl ToXml for Transform {
     fn serialize<W: std::fmt::Write + ?Sized>(
@@ -99,25 +99,25 @@ impl Index<usize> for Transform {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::Transform;
+pub mod tests {
     use instant_xml::{from_str, to_string, FromXml, ToXml};
+    use pretty_assertions::assert_eq;
+
+    use super::Transform;
 
     #[test]
     #[rustfmt::skip]
     fn toxml_transform() {
+        let xml_string = "3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664";
         let transform = Transform([
             3.141592, -2718.281828, 1618.033988,
             707.106781, -1414.213562, 2236.067977,
             1442.249570, -866.025403, 0.693147,
             1732.050807, -523.598775, 577.215664,
         ]);
-        let xml_string = to_string(&transform).unwrap();
-        println!("{:?}", transform);
-        assert_eq!(
-            xml_string,
-            "3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664"
-        );
+        let transform_string = to_string(&transform).unwrap();
+
+        assert_eq!(transform_string, xml_string);
     }
 
     // Transform is a transparent tuple struct, it can only be properly write/read to/from XML when
@@ -130,18 +130,16 @@ mod tests {
     #[test]
     #[rustfmt::skip]
     fn toxml_test_transform() {
+        let xml_string = "<TestTransform><transform>3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664</transform></TestTransform>";
        let test_transform = TestTransform{ transform: Transform([
             3.141592, -2718.281828, 1618.033988,
             707.106781, -1414.213562, 2236.067977,
             1442.249570, -866.025403, 0.693147,
             1732.050807, -523.598775, 577.215664,
         ])}; 
-        let xml_string = to_string(&test_transform).unwrap();
-        println!("{:?}", test_transform);
-        assert_eq!(
-            xml_string,
-            "<TestTransform><transform>3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664</transform></TestTransform>"
-        );
+        let transform_string = to_string(&test_transform).unwrap();
+
+        assert_eq!(transform_string, xml_string);
     }
 
     #[test]
@@ -150,7 +148,7 @@ mod tests {
         let xml_string =
             "<TestTransform><transform>3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664</transform></TestTransform>";
         let test_transform = from_str::<TestTransform>(&xml_string).unwrap();
-        println!("{:?}", test_transform);
+
         assert_eq!(
             test_transform.transform,
             Transform([
@@ -173,6 +171,7 @@ mod tests {
     #[test]
     #[rustfmt::skip]
     fn toxml_test_transform_rename() {
+        let xml_string = "<rename><transform-matrix>3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664</transform-matrix></rename>";
         let test_transform = TestTransformRename {
             transform: Transform([
                 3.141592, -2718.281828, 1618.033988,
@@ -181,12 +180,9 @@ mod tests {
                 1732.050807, -523.598775, 577.215664,
             ])
         };
-        let xml_string = to_string(&test_transform).unwrap();
-        println!("{:?}", test_transform);
-        assert_eq!(
-            xml_string,
-            "<rename><transform-matrix>3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664</transform-matrix></rename>"
-        );
+        let transform_string = to_string(&test_transform).unwrap();
+
+        assert_eq!(transform_string, xml_string);
     }
 
     #[test]
@@ -195,7 +191,7 @@ mod tests {
         let xml_string =
             "<rename><transform-matrix>3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664</transform-matrix></rename>";
         let test_transform = from_str::<TestTransformRename>(&xml_string).unwrap();
-        println!("{:?}", test_transform);
+
         assert_eq!(
             test_transform.transform,
            Transform([

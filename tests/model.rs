@@ -1,4 +1,4 @@
-use threemf::model::{Components, Object};
+use threemf::core::{component::Components, object::Object};
 
 #[test]
 fn test_object() {
