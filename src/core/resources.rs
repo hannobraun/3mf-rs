@@ -37,15 +37,18 @@ pub mod tests {
     use instant_xml::{from_str, to_string};
     use pretty_assertions::assert_eq;
 
-    use crate::{core::object::Object, threemf_namespaces::CORE_NS};
+    use crate::{
+        core::object::Object,
+        threemf_namespaces::{CORE_NS, PROD_NS, PROD_PREFIX},
+    };
 
     use super::{Base, BaseMaterials, Resources};
 
     #[test]
     pub fn toxml_resources_with_object_test() {
         let xml_string = format!(
-            r#"<resources xmlns="{}"><object id="1"></object></resources>"#,
-            CORE_NS
+            r#"<resources xmlns="{}"><object xmlns:{}="{}" id="1"></object></resources>"#,
+            CORE_NS, PROD_PREFIX, PROD_NS
         );
         let resources = Resources {
             object: vec![Object {
@@ -56,6 +59,7 @@ pub mod tests {
                 name: None,
                 pid: None,
                 pindex: None,
+                uuid: None,
                 mesh: None,
                 components: None,
             }],
@@ -85,6 +89,7 @@ pub mod tests {
                     name: None,
                     pid: None,
                     pindex: None,
+                    uuid: None,
                     mesh: None,
                     components: None,
                 }],

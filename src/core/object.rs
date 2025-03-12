@@ -3,12 +3,12 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     core::{component::Components, Mesh},
-    threemf_namespaces::CORE_NS,
+    threemf_namespaces::{CORE_NS, PROD_NS},
 };
 
 #[derive(Serialize, Deserialize, FromXml, ToXml, PartialEq, Debug)]
 #[serde(rename_all = "lowercase")]
-#[xml(ns(CORE_NS), rename = "object")]
+#[xml(ns(CORE_NS, p=PROD_NS), rename="object")]
 pub struct Object {
     #[serde(rename = "@id")]
     #[xml(attribute)]
@@ -37,6 +37,9 @@ pub struct Object {
     #[serde(rename = "@pindex", skip_serializing_if = "Option::is_none")]
     #[xml(attribute)]
     pub pindex: Option<usize>,
+
+    #[xml(attribute, ns(PROD_NS), rename = "UUID")]
+    pub uuid: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mesh: Option<Mesh>,
@@ -69,7 +72,7 @@ pub mod test {
             component::{Component, Components},
             Triangles, Vertices,
         },
-        threemf_namespaces::CORE_NS,
+        threemf_namespaces::{CORE_NS, PROD_NS, PROD_PREFIX},
         Mesh,
     };
 
@@ -77,7 +80,10 @@ pub mod test {
 
     #[test]
     pub fn toxml_simple_object_test() {
-        let xml_string = format!(r#"<object xmlns="{}" id="4"></object>"#, CORE_NS);
+        let xml_string = format!(
+            r#"<object xmlns="{}" xmlns:{}="{}" id="4"></object>"#,
+            CORE_NS, PROD_PREFIX, PROD_NS
+        );
         let object = Object {
             id: 4,
             objecttype: None,
@@ -86,6 +92,7 @@ pub mod test {
             name: None,
             pid: None,
             pindex: None,
+            uuid: None,
             mesh: None,
             components: None,
         };
@@ -109,6 +116,56 @@ pub mod test {
                 name: None,
                 pid: None,
                 pindex: None,
+                uuid: None,
+                mesh: None,
+                components: None,
+            }
+        );
+    }
+
+    #[test]
+    pub fn toxml_production_object_test() {
+        let xml_string = format!(
+            r#"<object xmlns="{}" xmlns:{}="{}" id="4" {}:UUID="someUUID"></object>"#,
+            CORE_NS, PROD_PREFIX, PROD_NS, PROD_PREFIX
+        );
+        let object = Object {
+            id: 4,
+            objecttype: None,
+            thumbnail: None,
+            partnumber: None,
+            name: None,
+            pid: None,
+            pindex: None,
+            uuid: Some("someUUID".to_owned()),
+            mesh: None,
+            components: None,
+        };
+        let object_string = to_string(&object).unwrap();
+
+        assert_eq!(object_string, xml_string);
+    }
+
+    #[test]
+    pub fn fromxml_production_object_test() {
+        const CUSTOM_PROD_PREFIX: &str = "custom";
+        let xml_string = format!(
+            r#"<object xmlns="{}" xmlns:{}="{}" id="4" {}:UUID="someUUID"></object>"#,
+            CORE_NS, CUSTOM_PROD_PREFIX, PROD_NS, CUSTOM_PROD_PREFIX,
+        );
+        let object = from_str::<Object>(&xml_string).unwrap();
+
+        assert_eq!(
+            object,
+            Object {
+                id: 4,
+                objecttype: None,
+                thumbnail: None,
+                partnumber: None,
+                name: None,
+                pid: None,
+                pindex: None,
+                uuid: Some("someUUID".to_owned()),
                 mesh: None,
                 components: None,
             }
@@ -118,8 +175,8 @@ pub mod test {
     #[test]
     pub fn toxml_intermediate_object_test() {
         let xml_string = format!(
-            r#"<object xmlns="{}" id="4" type="model" thumbnail="\thumbnail\part_thumbnail.png" partnumber="part_1" name="Object Part"></object>"#,
-            CORE_NS
+            r#"<object xmlns="{}" xmlns:{}="{}" id="4" type="model" thumbnail="\thumbnail\part_thumbnail.png" partnumber="part_1" name="Object Part"></object>"#,
+            CORE_NS, PROD_PREFIX, PROD_NS
         );
         let object = Object {
             id: 4,
@@ -129,6 +186,7 @@ pub mod test {
             name: Some("Object Part".to_string()),
             pid: None,
             pindex: None,
+            uuid: None,
             mesh: None,
             components: None,
         };
@@ -156,6 +214,7 @@ pub mod test {
                 name: Some("Object Part".to_string()),
                 pid: Some(123),
                 pindex: Some(123),
+                uuid: None,
                 mesh: None,
                 components: None,
             }
@@ -165,8 +224,8 @@ pub mod test {
     #[test]
     pub fn roundtrip_advanced_mesh_object_test() {
         let xml_string = format!(
-            r##"<object xmlns="{}" id="4" type="model" thumbnail="\thumbnail\part_thumbnail.png" partnumber="part_1" name="Object Part"><mesh><vertices></vertices><triangles></triangles></mesh></object>"##,
-            CORE_NS
+            r##"<object xmlns="{}" xmlns:{}="{}" id="4" type="model" thumbnail="\thumbnail\part_thumbnail.png" partnumber="part_1" name="Object Part"><mesh><vertices></vertices><triangles></triangles></mesh></object>"##,
+            CORE_NS, PROD_PREFIX, PROD_NS
         );
         let object = Object {
             id: 4,
@@ -176,6 +235,7 @@ pub mod test {
             name: Some("Object Part".to_string()),
             pid: None,
             pindex: None,
+            uuid: None,
             mesh: Some(Mesh {
                 vertices: Vertices { vertex: vec![] },
                 triangles: Triangles { triangle: vec![] },
@@ -192,8 +252,8 @@ pub mod test {
     #[test]
     pub fn roundtrip_advanced_component_object_test() {
         let xml_string = format!(
-            r##"<object xmlns="{}" id="4" type="model" thumbnail="\thumbnail\part_thumbnail.png" partnumber="part_1" name="Object Part"><components><component objectid="23" /></components></object>"##,
-            CORE_NS
+            r##"<object xmlns="{}" xmlns:{}="{}" id="4" type="model" thumbnail="\thumbnail\part_thumbnail.png" partnumber="part_1" name="Object Part"><components><component objectid="23" /></components></object>"##,
+            CORE_NS, PROD_PREFIX, PROD_NS
         );
         let object = Object {
             id: 4,
@@ -203,11 +263,14 @@ pub mod test {
             name: Some("Object Part".to_string()),
             pid: None,
             pindex: None,
+            uuid: None,
             mesh: None,
             components: Some(Components {
                 component: vec![Component {
                     objectid: 23,
                     transform: None,
+                    path: None,
+                    uuid: None,
                 }],
             }),
         };
