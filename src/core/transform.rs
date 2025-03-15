@@ -73,11 +73,11 @@ impl<'xml> FromXml<'xml> for Transform {
 
         if values.len() == MATRIX_SIZE {
             *into = Some(Transform(values.try_into().unwrap()));
-            return Ok(());
+            Ok(())
         } else {
-            return Err(Error::MissingValue(
+            Err(Error::MissingValue(
                 "Not enough values to form a Transform Matrix",
-            ));
+            ))
         }
     }
 
@@ -105,21 +105,6 @@ pub mod tests {
 
     use super::Transform;
 
-    #[test]
-    #[rustfmt::skip]
-    fn toxml_transform() {
-        let xml_string = "3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664";
-        let transform = Transform([
-            3.141592, -2718.281828, 1618.033988,
-            707.106781, -1414.213562, 2236.067977,
-            1442.249570, -866.025403, 0.693147,
-            1732.050807, -523.598775, 577.215664,
-        ]);
-        let transform_string = to_string(&transform).unwrap();
-
-        assert_eq!(transform_string, xml_string);
-    }
-
     // Transform is a transparent tuple struct, it can only be properly write/read to/from XML when
     //placed in a separate struct
     #[derive(FromXml, ToXml, PartialEq, Debug)]
@@ -130,11 +115,11 @@ pub mod tests {
     #[test]
     #[rustfmt::skip]
     fn toxml_test_transform() {
-        let xml_string = "<TestTransform><transform>3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664</transform></TestTransform>";
+        let xml_string = "<TestTransform><transform>3.665893 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693556 1732.050807 -523.598775 577.215664</transform></TestTransform>";
        let test_transform = TestTransform{ transform: Transform([
-            3.141592, -2718.281828, 1618.033988,
+            3.665893, -2718.281828, 1618.033988,
             707.106781, -1414.213562, 2236.067977,
-            1442.249570, -866.025403, 0.693147,
+            1442.249570, -866.025403, 0.693556,
             1732.050807, -523.598775, 577.215664,
         ])}; 
         let transform_string = to_string(&test_transform).unwrap();
@@ -145,19 +130,17 @@ pub mod tests {
     #[test]
     #[rustfmt::skip]
     fn fromxml_test_transform() {
-        let xml_string =
-            "<TestTransform><transform>3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664</transform></TestTransform>";
-        let test_transform = from_str::<TestTransform>(&xml_string).unwrap();
+        let xml_string = "<TestTransform><transform>3.665893 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693556 1732.050807 -523.598775 577.215664</transform></TestTransform>";
+        let test_transform = from_str::<TestTransform>(xml_string).unwrap();
 
         assert_eq!(
             test_transform.transform,
             Transform([
-                3.141592, -2718.281828, 1618.033988,
-                707.106781, -1414.213562, 2236.067977,
-                1442.249570, -866.025403, 0.693147,
-                1732.050807, -523.598775, 577.215664,
-            ])
-        );
+            3.665893, -2718.281828, 1618.033988,
+            707.106781, -1414.213562, 2236.067977,
+            1442.249570, -866.025403, 0.693556,
+            1732.050807, -523.598775, 577.215664,
+        ]));
     }
 
     // Transform rename
@@ -171,12 +154,12 @@ pub mod tests {
     #[test]
     #[rustfmt::skip]
     fn toxml_test_transform_rename() {
-        let xml_string = "<rename><transform-matrix>3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664</transform-matrix></rename>";
+        let xml_string = "<rename><transform-matrix>4.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.793147 1732.050807 -523.598775 577.215664</transform-matrix></rename>";
         let test_transform = TestTransformRename {
             transform: Transform([
-                3.141592, -2718.281828, 1618.033988,
+                4.141592, -2718.281828, 1618.033988,
                 707.106781, -1414.213562, 2236.067977,
-                1442.249570, -866.025403, 0.693147,
+                1442.249570, -866.025403, 0.793147,
                 1732.050807, -523.598775, 577.215664,
             ])
         };
@@ -189,15 +172,15 @@ pub mod tests {
     #[rustfmt::skip]
     fn fromxml_test_transform_rename() {
         let xml_string =
-            "<rename><transform-matrix>3.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.693147 1732.050807 -523.598775 577.215664</transform-matrix></rename>";
-        let test_transform = from_str::<TestTransformRename>(&xml_string).unwrap();
+            "<rename><transform-matrix>4.141592 -2718.281828 1618.033988 707.106781 -1414.213562 2236.067977 1442.249570 -866.025403 0.793147 1732.050807 -523.598775 577.215664</transform-matrix></rename>";
+        let test_transform = from_str::<TestTransformRename>(xml_string).unwrap();
 
         assert_eq!(
             test_transform.transform,
            Transform([
-                3.141592, -2718.281828, 1618.033988,
+                4.141592, -2718.281828, 1618.033988,
                 707.106781, -1414.213562, 2236.067977,
-                1442.249570, -866.025403, 0.693147,
+                1442.249570, -866.025403, 0.793147,
                 1732.050807, -523.598775, 577.215664,
             ]) 
         );

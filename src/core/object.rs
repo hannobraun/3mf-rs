@@ -289,7 +289,8 @@ pub mod test {
     #[test]
     pub fn toxml_objecttype_test() {
         let xml_string = format!(
-            r#"<ObjectTypes><objecttype>model</objecttype><objecttype>support</objecttype><objecttype>solidsupport</objecttype><objecttype>support</objecttype><objecttype>other</objecttype></ObjectTypes>"#,
+            r#"<ObjectTypes><{s}>model</{s}><{s}>support</{s}><{s}>solidsupport</{s}><{s}>support</{s}><{s}>other</{s}></ObjectTypes>"#,
+            s = "objecttype"
         );
         let objecttypes = ObjectTypes {
             objecttype: vec![

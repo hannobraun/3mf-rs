@@ -308,7 +308,7 @@ pub mod test {
     #[test]
     pub fn fromxml_units_test() {
         let xml_string = r#"<UnitsVector><unit>micron</unit><unit>millimeter</unit><unit>centimeter</unit><unit>inch</unit><unit>foot</unit><unit>meter</unit></UnitsVector>"#;
-        let unitsvector = from_str::<UnitsVector>(&xml_string).unwrap();
+        let unitsvector = from_str::<UnitsVector>(xml_string).unwrap();
 
         assert_eq!(
             unitsvector,
