@@ -4,8 +4,8 @@ use std::io::{self, BufReader, Read};
 use quick_xml::de::Deserializer;
 use zip::ZipArchive;
 
+use super::error::Error;
 use crate::core::model::Model;
-use crate::Error;
 
 /// Read all models from a 3MF reader
 pub fn read<R: Read + io::Seek>(reader: R) -> Result<Vec<Model>, Error> {

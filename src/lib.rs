@@ -21,9 +21,7 @@
 //! [Open Packaging Conventions]: https://standards.iso.org/ittf/PubliclyAvailableStandards/c061796_ISO_IEC_29500-2_2012.zip
 
 pub mod core;
-pub mod error;
-pub mod read;
+pub mod io;
 pub mod threemf_namespaces;
-pub mod write;
 
-pub use self::{core::Mesh, error::Error, read::read, write::write};
+pub use self::{core::Mesh, io::read::read, io::write::write};

@@ -1,6 +1,7 @@
 use std::io::{self, prelude::*};
 
-use crate::{core::model::Model, Error};
+use super::error::Error;
+use crate::core::model::Model;
 use quick_xml::{
     events::{BytesDecl, Event},
     se::Serializer,
@@ -38,3 +39,5 @@ pub fn write<W: Write + io::Seek, M: Into<Model>>(writer: W, model: M) -> Result
 
     Ok(())
 }
+
+pub mod v2 {}

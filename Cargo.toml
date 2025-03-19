@@ -17,6 +17,7 @@ repository = "https://github.com/hannobraun/3mf-rs"
 [dependencies]
 quick-xml = { version = "0.37.0", features = ["serialize"] }
 instant-xml = { git = "https://github.com/djc/instant-xml.git", branch = "main" }
+image = { version = "0.25.5", default-features = false, features = ["png"] }
 #instant-xml = { version = "0.5.2" }
 instant-xml-macros = { version = "0.5.2" }
 serde = { version = "1.0.152", features = ["derive"] }
