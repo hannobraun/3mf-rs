@@ -18,6 +18,7 @@ pub struct ThreemfPackage {
     pub root: Model,
     pub sub_models: HashMap<String, Model>,
     pub thumbnails: HashMap<String, DynamicImage>,
+    pub relationships: HashMap<String, Relationships>,
     pub content_types: ContentTypes,
 }
 
@@ -50,6 +51,7 @@ impl ThreemfPackage {
         const ROOT_RELS_FILENAME: &str = "_rels/.rels";
         let mut models = HashMap::<String, Model>::new();
         let mut thumbnails = HashMap::<String, DynamicImage>::new();
+        let mut relationships = HashMap::<String, Relationships>::new();
         let mut root_model_path: &str = "";
 
         let root_rels: Relationships =
@@ -63,13 +65,13 @@ impl ThreemfPackage {
                     .iter()
                     .find(|rels| rels.relationship_type == RelationshipType::Model)
                     .unwrap();
-                root_model_path = &model_rels.target
+                root_model_path = &model_rels.target;
+                relationships.insert(ROOT_RELS_FILENAME.to_owned(), root_rels.clone());
             }
             Err(err) => return Err(err),
         }
 
         if process_sub_models {
-            let mut rels_list: Vec<Relationships> = vec![];
             {
                 for value in 0..zip.len() {
                     let file = zip.by_index(value)?;
@@ -80,7 +82,7 @@ impl ThreemfPackage {
                                 && path != PathBuf::from(ROOT_RELS_FILENAME)
                             {
                                 let rels = relationships_from_zipfile(file)?;
-                                rels_list.push(rels);
+                                relationships.insert("lala".to_owned(), rels);
                             }
                         }
                     }
@@ -88,8 +90,8 @@ impl ThreemfPackage {
             }
 
             {
-                rels_list.iter_mut().for_each(|rels| {
-                    let _ = process_rels(&mut zip, rels, &mut models, &mut thumbnails);
+                relationships.iter_mut().for_each(|rels| {
+                    process_rels(&mut zip, rels.1, &mut models, &mut thumbnails).unwrap();
                 });
             }
         }
@@ -100,6 +102,7 @@ impl ThreemfPackage {
             root: root_model,
             sub_models: models,
             thumbnails,
+            relationships,
             content_types,
         })
     }
@@ -190,6 +193,7 @@ pub mod tests {
             Ok(threemf) => {
                 assert_eq!(threemf.sub_models.len(), 1);
                 assert_eq!(threemf.thumbnails.len(), 1);
+                assert_eq!(threemf.relationships.len(), 2);
             }
             Err(err) => panic!("{:?}", err),
         }

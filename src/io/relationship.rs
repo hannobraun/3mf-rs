@@ -2,7 +2,7 @@ use instant_xml::{FromXml, ToXml};
 
 const RELATIONSHIP_NS: &str = "http://schemas.openxmlformats.org/package/2006/relationships";
 
-#[derive(ToXml, FromXml, Debug, PartialEq, Eq)]
+#[derive(ToXml, FromXml, Debug, Clone, PartialEq, Eq)]
 #[xml(ns(RELATIONSHIP_NS))]
 pub struct Relationship {
     #[xml(attribute, rename = "Id")]
@@ -15,13 +15,13 @@ pub struct Relationship {
     pub relationship_type: RelationshipType,
 }
 
-#[derive(ToXml, FromXml, Debug, PartialEq, Eq)]
+#[derive(ToXml, FromXml, Debug, Clone, PartialEq, Eq)]
 #[xml(ns(RELATIONSHIP_NS))]
 pub struct Relationships {
     pub relationships: Vec<Relationship>,
 }
 
-#[derive(ToXml, FromXml, Debug, PartialEq, Eq)]
+#[derive(ToXml, FromXml, Debug, Clone, Copy, PartialEq, Eq)]
 #[xml(scalar)]
 pub enum RelationshipType {
     #[xml(
