@@ -1,3 +1,4 @@
+use image::ImageError;
 use thiserror::Error;
 use zip::result::ZipError;
 
@@ -11,6 +12,18 @@ pub enum Error {
     /// Error writing ZIP file (3MF files are ZIP files)
     #[error("Error writing ZIP file (3MF files are ZIP files)")]
     Zip(#[from] ZipError),
+
+    #[error("Error reading 3mf file: {0}")]
+    ReadError(String),
+
+    #[error("Error reading thumbnail image: {0}")]
+    ImageReadError(#[from] ImageError),
+
+    #[error("Error writing 3mf file: {0}")]
+    WriteError(String),
+
+    #[error("Derialization error from Instant-Xml")]
+    InstantXmlError(#[from] instant_xml::Error),
 
     /// Error Deserializing internal 3MF XML structure
     #[error("Deserialization error from xml reading")]

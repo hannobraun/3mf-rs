@@ -1,8 +1,3 @@
-use std::collections::HashMap;
-use std::ffi::OsStr;
-use std::io::{self, Read, Seek, Write};
-use std::path::PathBuf;
-
 use image::{load_from_memory, DynamicImage};
 use instant_xml::{from_str, to_string, ToXml};
 use zip::write::SimpleFileOptions;
@@ -10,11 +5,16 @@ use zip::{ZipArchive, ZipWriter};
 
 use crate::core::model::Model;
 
-use super::content_types::ContentTypes;
+use super::content_types::{ContentTypes, DefaultContentTypeEnum};
 use super::error::Error;
 use super::relationship::{RelationshipType, Relationships};
 
-#[derive(Debug)]
+use std::collections::HashMap;
+use std::ffi::OsStr;
+use std::io::{self, Read, Seek, Write};
+use std::path::PathBuf;
+
+#[derive(Debug, PartialEq)]
 pub struct ThreemfPackage {
     pub root: Model,
     pub sub_models: HashMap<String, Model>,
@@ -27,7 +27,7 @@ impl ThreemfPackage {
     pub fn from_reader<R: Read + io::Seek>(
         reader: R,
         process_sub_models: bool,
-    ) -> Result<ThreemfPackage, Error> {
+    ) -> Result<Self, Error> {
         let mut zip = ZipArchive::new(reader)?;
 
         let content_types: ContentTypes;
@@ -40,8 +40,7 @@ impl ThreemfPackage {
                     let mut xml_string: String = Default::default();
                     let _ = file.read_to_string(&mut xml_string)?;
 
-                    //ToDo extend the error
-                    from_str::<ContentTypes>(&xml_string).unwrap()
+                    from_str::<ContentTypes>(&xml_string)?
                 }
                 Err(err) => {
                     return Err(Error::Zip(err));
@@ -49,14 +48,27 @@ impl ThreemfPackage {
             }
         }
 
-        const ROOT_RELS_FILENAME: &str = "_rels/.rels";
+        let rels_ext = {
+            let rels_content = content_types
+                .defaults
+                .iter()
+                .find(|t| t.content_type == DefaultContentTypeEnum::Relationship);
+
+            match rels_content {
+                Some(rels) => &rels.extension,
+                None => "rels",
+            }
+        };
+
+        let root_rels_filename: &str = &format!("_rels/.{rels_ext}");
+
         let mut models = HashMap::<String, Model>::new();
         let mut thumbnails = HashMap::<String, DynamicImage>::new();
         let mut relationships = HashMap::<String, Relationships>::new();
         let mut root_model_path: &str = "";
 
         let root_rels: Relationships =
-            relationships_from_zip_by_name(&mut zip, ROOT_RELS_FILENAME)?;
+            relationships_from_zip_by_name(&mut zip, root_rels_filename)?;
 
         let root_model_processed = process_rels(&mut zip, &root_rels, &mut models, &mut thumbnails);
         match root_model_processed {
@@ -64,10 +76,12 @@ impl ThreemfPackage {
                 let model_rels = root_rels
                     .relationships
                     .iter()
-                    .find(|rels| rels.relationship_type == RelationshipType::Model)
-                    .unwrap();
-                root_model_path = &model_rels.target;
-                relationships.insert(ROOT_RELS_FILENAME.to_owned(), root_rels.clone());
+                    .find(|rels| rels.relationship_type == RelationshipType::Model);
+
+                if let Some(root_model) = model_rels {
+                    root_model_path = &root_model.target;
+                    relationships.insert(root_rels_filename.to_owned(), root_rels.clone());
+                }
             }
             Err(err) => return Err(err),
         }
@@ -80,32 +94,41 @@ impl ThreemfPackage {
                     if file.is_file() {
                         if let Some(path) = file.enclosed_name() {
                             if Some(OsStr::new("rels")) == path.extension()
-                                && path != PathBuf::from(ROOT_RELS_FILENAME)
+                                && path != PathBuf::from(root_rels_filename)
                             {
-                                let rels = relationships_from_zipfile(file)?;
-                                relationships.insert("lala".to_owned(), rels);
+                                match path.to_str() {
+                                    Some(path_str) => {
+                                        let rels = relationships_from_zipfile(file)?;
+                                        relationships.insert(format!("/{path_str}"), rels);
+                                    }
+                                    None => {
+                                        return Err(Error::ReadError(
+                                            "Failed to read the relationship file path".to_owned(),
+                                        ))
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
 
-            {
-                relationships.iter_mut().for_each(|rels| {
-                    process_rels(&mut zip, rels.1, &mut models, &mut thumbnails).unwrap();
-                });
+            for rels in &relationships {
+                process_rels(&mut zip, rels.1, &mut models, &mut thumbnails)?;
             }
         }
 
-        let root_model = models.remove(root_model_path).unwrap();
-
-        Ok(ThreemfPackage {
-            root: root_model,
-            sub_models: models,
-            thumbnails,
-            relationships,
-            content_types,
-        })
+        if let Some(root_model) = models.remove(root_model_path) {
+            Ok(Self {
+                root: root_model,
+                sub_models: models,
+                thumbnails,
+                relationships,
+                content_types,
+            })
+        } else {
+            Err(Error::ReadError("Root model not found".to_owned()))
+        }
     }
 
     pub fn write<W: io::Write + io::Seek>(&self, threemf_archive: W) -> Result<(), Error> {
@@ -121,16 +144,27 @@ impl ThreemfPackage {
                     RelationshipType::Model => {
                         let model = if *path == *"_rels/.rels" {
                             &self.root
-                        } else {
-                            let model = self.sub_models.get(&relationship.target).unwrap();
+                        } else if let Some(model) = self.sub_models.get(&relationship.target) {
                             model
+                        } else {
+                            return Err(Error::WriteError(format!(
+                                "No model found for relationship target {}",
+                                relationship.target
+                            )));
                         };
                         archive_write_xml_with_header(&mut archive, &relationship.target, model)?;
                     }
                     RelationshipType::Thumbnail => {
-                        let image = self.thumbnails.get(&relationship.target).unwrap();
-                        archive.start_file(&relationship.target, SimpleFileOptions::default())?;
-                        archive.write_all(image.as_bytes())?;
+                        if let Some(image) = self.thumbnails.get(&relationship.target) {
+                            archive
+                                .start_file(&relationship.target, SimpleFileOptions::default())?;
+                            archive.write_all(image.as_bytes())?;
+                        } else {
+                            return Err(Error::WriteError(format!(
+                                "No thumbnail image found for relationshhip target {}",
+                                &relationship.target
+                            )));
+                        }
                     }
                 }
             }
@@ -154,8 +188,9 @@ fn relationships_from_zip_by_name<R: Read + io::Seek>(
 fn relationships_from_zipfile(mut file: zip::read::ZipFile<'_>) -> Result<Relationships, Error> {
     let mut xml_string: String = Default::default();
     let _ = file.read_to_string(&mut xml_string)?;
+    let rels = from_str::<Relationships>(&xml_string)?;
 
-    Ok(from_str::<Relationships>(&xml_string).unwrap())
+    Ok(rels)
 }
 
 fn process_rels<R: Read + io::Seek>(
@@ -169,15 +204,14 @@ fn process_rels<R: Read + io::Seek>(
         .iter()
         .filter(|r| r.relationship_type == RelationshipType::Model);
     for rels in model_rels {
-        let model_file_target = PathBuf::from(&rels.target.clone());
-        let model_file_path = model_file_target.strip_prefix("/").unwrap();
-        let model_file = zip.by_name(model_file_path.to_str().unwrap());
+        let name = try_strip_leading_slash(&rels.target);
+        let model_file = zip.by_name(name);
         match model_file {
             Ok(mut file) => {
                 let mut xml_string: String = Default::default();
-                let _ = file.read_to_string(&mut xml_string).unwrap();
+                let _ = file.read_to_string(&mut xml_string)?;
 
-                let model = from_str::<Model>(&xml_string).unwrap();
+                let model = from_str::<Model>(&xml_string)?;
                 models.insert(rels.target.clone(), model);
             }
             Err(err) => return Err(Error::Zip(err)),
@@ -190,15 +224,14 @@ fn process_rels<R: Read + io::Seek>(
         .filter(|r| r.relationship_type == RelationshipType::Thumbnail);
 
     for rels in thumbnails_rels {
-        let thumbnail_file_target = PathBuf::from(&rels.target.clone());
-        let thumbnail_file_path = thumbnail_file_target.strip_prefix("/").unwrap();
-        let thumbnail_file = zip.by_name(thumbnail_file_path.to_str().unwrap());
+        let name = try_strip_leading_slash(&rels.target);
+        let thumbnail_file = zip.by_name(name);
         match thumbnail_file {
             Ok(mut file) => {
                 let mut bytes: Vec<u8> = vec![];
-                let _ = file.read_to_end(&mut bytes).unwrap();
+                let _ = file.read_to_end(&mut bytes)?;
 
-                let image = load_from_memory(&bytes).unwrap();
+                let image = load_from_memory(&bytes)?;
                 thumbnails.insert(rels.target.clone(), image);
             }
             Err(err) => return Err(Error::Zip(err)),
@@ -208,6 +241,13 @@ fn process_rels<R: Read + io::Seek>(
     Ok(())
 }
 
+fn try_strip_leading_slash(target: &str) -> &str {
+    match target.strip_prefix("/") {
+        Some(stripped) => stripped,
+        None => target,
+    }
+}
+
 fn archive_write_xml_with_header<W: Write + Seek, T: ToXml + ?Sized>(
     archive: &mut ZipWriter<W>,
     filename: &str,
@@ -215,7 +255,7 @@ fn archive_write_xml_with_header<W: Write + Seek, T: ToXml + ?Sized>(
 ) -> Result<(), Error> {
     const XML_HEADER: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"#;
 
-    let mut content_string = to_string(&content).unwrap();
+    let mut content_string = to_string(&content)?;
     content_string.insert_str(0, XML_HEADER);
 
     archive.start_file(filename, SimpleFileOptions::default())?;
@@ -225,6 +265,8 @@ fn archive_write_xml_with_header<W: Write + Seek, T: ToXml + ?Sized>(
 
 #[cfg(test)]
 pub mod tests {
+    use pretty_assertions::assert_eq;
+
     use crate::{
         core::{
             build::Build,
@@ -236,6 +278,7 @@ pub mod tests {
     };
 
     use super::ThreemfPackage;
+
     use std::{collections::HashMap, fs::File, io::Cursor, path::Path};
 
     #[test]
@@ -251,6 +294,12 @@ pub mod tests {
                 assert_eq!(threemf.sub_models.len(), 1);
                 assert_eq!(threemf.thumbnails.len(), 1);
                 assert_eq!(threemf.relationships.len(), 2);
+
+                assert!(threemf.sub_models.contains_key("/3D/midway.model"));
+
+                assert!(threemf
+                    .relationships
+                    .contains_key("/3D/_rels/3dmodel.model.rels"));
             }
             Err(err) => panic!("{:?}", err),
         }

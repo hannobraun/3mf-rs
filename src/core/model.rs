@@ -1,5 +1,3 @@
-use std::vec;
-
 use instant_xml::{FromXml, ToXml};
 use serde::{Deserialize, Serialize};
 
@@ -13,6 +11,10 @@ use crate::{
     },
     threemf_namespaces::{CORE_NS, PROD_NS},
 };
+
+use super::object::ObjectType;
+
+use std::vec;
 
 #[derive(Serialize, Deserialize, FromXml, ToXml, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -74,10 +76,10 @@ impl From<Mesh> for Model {
     fn from(mesh: Mesh) -> Self {
         let object = Object {
             id: 1,
-            objecttype: None,
+            objecttype: Some(ObjectType::Model),
             thumbnail: None,
             partnumber: None,
-            name: None,
+            name: Some("Mesh".to_owned()),
             pid: None,
             pindex: None,
             uuid: None,
