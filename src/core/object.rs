@@ -62,21 +62,20 @@ pub enum ObjectType {
 
 #[cfg(test)]
 pub mod test {
-    use std::vec;
-
     use instant_xml::{from_str, to_string, FromXml, ToXml};
     use pretty_assertions::assert_eq;
 
     use crate::{
         core::{
             component::{Component, Components},
-            Triangles, Vertices,
+            Mesh, Triangles, Vertices,
         },
         threemf_namespaces::{CORE_NS, PROD_NS, PROD_PREFIX},
-        Mesh,
     };
 
     use super::{Object, ObjectType};
+
+    use std::vec;
 
     #[test]
     pub fn toxml_simple_object_test() {

@@ -1,11 +1,11 @@
-use serde::Deserialize;
-use std::io::{self, BufReader, Read};
-
 use quick_xml::de::Deserializer;
+use serde::Deserialize;
 use zip::ZipArchive;
 
-use super::error::Error;
 use crate::core::model::Model;
+use crate::io::error::Error;
+
+use std::io::{self, BufReader, Read};
 
 /// Read all models from a 3MF reader
 pub fn read<R: Read + io::Seek>(reader: R) -> Result<Vec<Model>, Error> {

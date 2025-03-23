@@ -1,5 +1,6 @@
 use instant_xml::*;
 use serde::{Deserialize, Serialize};
+
 use std::ops::Index;
 
 const MATRIX_SIZE: usize = 12;

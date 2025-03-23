@@ -1,9 +1,10 @@
 use instant_xml::{FromXml, ToXml};
 use serde::{Deserialize, Serialize};
 
-use crate::threemf_namespaces::{CORE_NS, PROD_NS};
-
-use super::transform::Transform;
+use crate::{
+    core::transform::Transform,
+    threemf_namespaces::{CORE_NS, PROD_NS},
+};
 
 #[derive(Serialize, Deserialize, Default, FromXml, ToXml, PartialEq, Debug)]
 #[xml(ns(CORE_NS, p=PROD_NS), rename = "build")]

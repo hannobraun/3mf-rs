@@ -5,14 +5,12 @@ use crate::{
     core::{
         build::{Build, Item},
         metadata::Metadata,
-        object::Object,
+        object::{Object, ObjectType},
         resources::Resources,
         Mesh,
     },
     threemf_namespaces::{CORE_NS, PROD_NS},
 };
-
-use super::object::ObjectType;
 
 use std::vec;
 
@@ -110,7 +108,6 @@ impl From<Mesh> for Model {
 
 #[cfg(test)]
 pub mod test {
-
     use instant_xml::{from_str, to_string, FromXml, ToXml};
     use pretty_assertions::assert_eq;
 

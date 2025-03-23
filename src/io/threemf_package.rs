@@ -3,11 +3,14 @@ use instant_xml::{from_str, to_string, ToXml};
 use zip::write::SimpleFileOptions;
 use zip::{ZipArchive, ZipWriter};
 
-use crate::core::model::Model;
-
-use super::content_types::{ContentTypes, DefaultContentTypeEnum};
-use super::error::Error;
-use super::relationship::{RelationshipType, Relationships};
+use crate::{
+    core::model::Model,
+    io::{
+        content_types::{ContentTypes, DefaultContentTypeEnum},
+        error::Error,
+        relationship::{RelationshipType, Relationships},
+    },
+};
 
 use std::collections::HashMap;
 use std::ffi::OsStr;
