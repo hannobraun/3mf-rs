@@ -279,14 +279,14 @@ pub mod tests {
 
     use super::ThreemfPackage;
 
-    use std::{collections::HashMap, fs::File, io::Cursor, path::Path};
+    use std::{collections::HashMap, io::Cursor};
 
     #[test]
     pub fn from_reader_test() {
-        let path = Path::new("tests\\data\\P_XPX_0702_02.3mf");
-        let file = File::open(path).unwrap();
+        let bytes = include_bytes!("../../tests/data/P_XPX_0702_02.3mf");
+        let reader = Cursor::new(bytes);
 
-        let result = ThreemfPackage::from_reader(file, true);
+        let result = ThreemfPackage::from_reader(reader, true);
         // println!("{:?}", result);
 
         match result {
