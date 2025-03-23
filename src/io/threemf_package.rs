@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 use std::ffi::OsStr;
-use std::io::{self, Read};
+use std::io::{self, Read, Seek, Write};
 use std::path::PathBuf;
 
 use image::{load_from_memory, DynamicImage};
-use instant_xml::from_str;
-use zip::ZipArchive;
+use instant_xml::{from_str, to_string, ToXml};
+use zip::write::SimpleFileOptions;
+use zip::{ZipArchive, ZipWriter};
 
 use crate::core::model::Model;
 
@@ -106,6 +107,37 @@ impl ThreemfPackage {
             content_types,
         })
     }
+
+    pub fn write<W: io::Write + io::Seek>(&self, threemf_archive: W) -> Result<(), Error> {
+        let mut archive = ZipWriter::new(threemf_archive);
+
+        archive_write_xml_with_header(&mut archive, "[Content_Types].xml", &self.content_types)?;
+
+        for (path, relationships) in &self.relationships {
+            archive_write_xml_with_header(&mut archive, path, &relationships)?;
+
+            for relationship in &relationships.relationships {
+                match relationship.relationship_type {
+                    RelationshipType::Model => {
+                        let model = if *path == *"_rels/.rels" {
+                            &self.root
+                        } else {
+                            let model = self.sub_models.get(&relationship.target).unwrap();
+                            model
+                        };
+                        archive_write_xml_with_header(&mut archive, &relationship.target, model)?;
+                    }
+                    RelationshipType::Thumbnail => {
+                        let image = self.thumbnails.get(&relationship.target).unwrap();
+                        archive.start_file(&relationship.target, SimpleFileOptions::default())?;
+                        archive.write_all(image.as_bytes())?;
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
 }
 
 fn relationships_from_zip_by_name<R: Read + io::Seek>(
@@ -176,10 +208,35 @@ fn process_rels<R: Read + io::Seek>(
     Ok(())
 }
 
+fn archive_write_xml_with_header<W: Write + Seek, T: ToXml + ?Sized>(
+    archive: &mut ZipWriter<W>,
+    filename: &str,
+    content: &T,
+) -> Result<(), Error> {
+    const XML_HEADER: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"#;
+
+    let mut content_string = to_string(&content).unwrap();
+    content_string.insert_str(0, XML_HEADER);
+
+    archive.start_file(filename, SimpleFileOptions::default())?;
+    archive.write_all(content_string.as_bytes())?;
+    Ok(())
+}
+
 #[cfg(test)]
 pub mod tests {
+    use crate::{
+        core::{
+            build::Build,
+            model::{self, Model},
+            object::{Object, ObjectType},
+            resources::Resources,
+        },
+        io::{content_types::*, relationship::*},
+    };
+
     use super::ThreemfPackage;
-    use std::{fs::File, path::Path};
+    use std::{collections::HashMap, fs::File, io::Cursor, path::Path};
 
     #[test]
     pub fn from_reader_test() {
@@ -197,5 +254,69 @@ pub mod tests {
             }
             Err(err) => panic!("{:?}", err),
         }
+    }
+
+    #[test]
+    pub fn write_test() {
+        let bytes = {
+            let bytes = Vec::<u8>::new();
+            let mut writer = Cursor::new(bytes);
+            let threemf = ThreemfPackage {
+                root: Model {
+                    xmlns: None,
+                    unit: model::Unit::Centimeter,
+                    requiredextensions: None,
+                    recommendedextensions: None,
+                    metadata: vec![],
+                    resources: Resources {
+                        object: vec![Object {
+                            id: 1,
+                            objecttype: Some(ObjectType::Model),
+                            thumbnail: None,
+                            partnumber: None,
+                            name: Some("Some object".to_owned()),
+                            pid: None,
+                            pindex: None,
+                            uuid: Some("uuid".to_owned()),
+                            mesh: None,
+                            components: None,
+                        }],
+                        basematerials: vec![],
+                    },
+                    build: Build {
+                        uuid: None,
+                        item: vec![],
+                    },
+                },
+                sub_models: HashMap::new(),
+                thumbnails: HashMap::new(),
+                relationships: HashMap::from([(
+                    "_rels/.rels".to_owned(),
+                    Relationships {
+                        relationships: vec![Relationship {
+                            id: "rel0".to_owned(),
+                            target: "/3D/3Dmodel.model".to_owned(),
+                            relationship_type: RelationshipType::Model,
+                        }],
+                    },
+                )]),
+                content_types: ContentTypes {
+                    defaults: vec![
+                        DefaultContentTypes {
+                            extension: "rels".to_owned(),
+                            content_type: DefaultContentTypeEnum::Relationship,
+                        },
+                        DefaultContentTypes {
+                            extension: "model".to_owned(),
+                            content_type: DefaultContentTypeEnum::Model,
+                        },
+                    ],
+                },
+            };
+            threemf.write(&mut writer).unwrap();
+            writer
+        };
+
+        assert_eq!(bytes.into_inner().len(), 943);
     }
 }
