@@ -1,20 +1,34 @@
 use instant_xml::{FromXml, ToXml};
 
+/// Content types for the Open Packaging Conventions (OPC).
+/// Contains a collection of [DefaultContentTypes].
+/// [DefaultContentTypes] contains the [DefaultContetnTypeEnum] specifying the content type.
+/// [DefaultContentTypes] contains the file extension that is used for the specified content type.
+#[derive(ToXml, FromXml, Debug, PartialEq, Eq)]
+#[xml(ns(CONTENT_TYPES_NS), rename = "Types")]
+pub struct ContentTypes {
+    pub defaults: Vec<DefaultContentTypes>,
+}
+
+/// Predefined content types supported by [threemf::io] currently.
+/// If a content type is not found, it will fail the 3mf file parsing.
 #[derive(ToXml, FromXml, Debug, PartialEq, Eq)]
 #[xml(scalar)]
 pub enum DefaultContentTypeEnum {
+    /// Represents a relationship content.
     #[xml(rename = "application/vnd.openxmlformats-package.relationships+xml")]
     Relationship,
 
+    /// Represents a 3D model content.
     #[xml(rename = "application/vnd.ms-package.3dmanufacturing-3dmodel+xml")]
     Model,
 
+    /// Represents a PNG image content.
     #[xml(rename = "image/png")]
     ImagePng,
 }
 
-const CONTENT_TYPES_NS: &str = "http://schemas.openxmlformats.org/package/2006/content-types";
-
+/// Internal structure for serde of [ContentTypes].
 #[derive(ToXml, FromXml, Debug, PartialEq, Eq)]
 #[xml(ns(CONTENT_TYPES_NS), rename = "Default")]
 pub struct DefaultContentTypes {
@@ -25,11 +39,7 @@ pub struct DefaultContentTypes {
     pub content_type: DefaultContentTypeEnum,
 }
 
-#[derive(ToXml, FromXml, Debug, PartialEq, Eq)]
-#[xml(ns(CONTENT_TYPES_NS), rename = "Types")]
-pub struct ContentTypes {
-    pub defaults: Vec<DefaultContentTypes>,
-}
+const CONTENT_TYPES_NS: &str = "http://schemas.openxmlformats.org/package/2006/content-types";
 
 #[cfg(test)]
 pub mod tests {

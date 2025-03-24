@@ -17,16 +17,43 @@ use std::ffi::OsStr;
 use std::io::{self, Read, Seek, Write};
 use std::path::PathBuf;
 
+/// Represents a 3mf package, the nested folder structure of the parts
+/// in the 3mf package will be flattened into respective dictionaries with
+/// the key being the path of the part in the archive package.
 #[derive(Debug, PartialEq)]
 pub struct ThreemfPackage {
+    /// The root model of the 3mf package.
+    /// Expected to always exist and be a valid model with a [Build](crate::core::build::Build) object.
     pub root: Model,
+
+    /// The sub models contained in the file. Usually this is to represent the [Object](crate::core::object::Object)
+    /// that are to be referenced in the [root](ThreemfPackage::root) model part.
+    /// The key is the path of the model in the archive package.
     pub sub_models: HashMap<String, Model>,
+
+    /// The thumbnails contained in the file.
+    /// The key is the path of the thumbnail in the archive package.
+    /// The thumbnail paths defined in the [Model](crate::core::model::Model) object should match the keys in this dictionary.
     pub thumbnails: HashMap<String, DynamicImage>,
+
+    /// The relationships between the different parts in the 3mf package.
+    /// The key is the path of the relationship file in the archive package.
+    /// Always expected to have at least 1 relationship file,
+    /// the root relationship file placed within "_rels" folder at the root of the package
     pub relationships: HashMap<String, Relationships>,
+
+    /// A summary of all Default Content Types that exists in the current 3mf package.
+    /// The reader/writer will fail if an unsupported content type is found in the package.
+    /// The extensions defined in the [ContentTypes.xml]
+    ///  file should match the extensions of the parts in the package.
     pub content_types: ContentTypes,
 }
 
 impl ThreemfPackage {
+    /// Reads a 3mf package from a [reader].
+    /// Expected to deal with nested parts of the 3mf package and flatten them into the respective dictionaries.
+    /// Only If [process_sub_models] is set to true, it will process the sub models and thumbnails associated with the sub models in the package.
+    /// Will return an error if the package is not a valid 3mf package or if the package contains unsupported content types.
     pub fn from_reader<R: Read + io::Seek>(
         reader: R,
         process_sub_models: bool,
@@ -134,6 +161,9 @@ impl ThreemfPackage {
         }
     }
 
+    /// Writes the 3mf package to a [writer].
+    /// Expects a well formed [ThreemfPackage] object to write the package.
+    /// A well formed packaged requires atleast 1 root model and 1 relationship file along with the content types.
     pub fn write<W: io::Write + io::Seek>(&self, threemf_archive: W) -> Result<(), Error> {
         let mut archive = ZipWriter::new(threemf_archive);
 

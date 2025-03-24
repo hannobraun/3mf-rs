@@ -2,32 +2,43 @@ use instant_xml::{FromXml, ToXml};
 
 const RELATIONSHIP_NS: &str = "http://schemas.openxmlformats.org/package/2006/relationships";
 
+/// Represents a relationship of a single part in the 3mf package along with its [RelationshipType]
+/// and target path of the part in the archive.
 #[derive(ToXml, FromXml, Debug, Clone, PartialEq, Eq)]
 #[xml(ns(RELATIONSHIP_NS))]
 pub struct Relationship {
+    /// The unique identifier of the relationship.
     #[xml(attribute, rename = "Id")]
     pub id: String,
 
+    /// Target path of the part in the archive.
     #[xml(attribute, rename = "Target")]
     pub target: String,
 
+    /// The actual relationship of the target part
     #[xml(attribute, rename = "Type")]
     pub relationship_type: RelationshipType,
 }
 
+/// Represents a collection of [Relationship]s where each collection is an independent
+/// relationship part in the 3mf package. A single 3mf package may contain multiple [Relationships].
 #[derive(ToXml, FromXml, Debug, Clone, PartialEq, Eq)]
 #[xml(ns(RELATIONSHIP_NS))]
 pub struct Relationships {
     pub relationships: Vec<Relationship>,
 }
 
+/// Represents the type of relationship of a part in the 3mf package.
 #[derive(ToXml, FromXml, Debug, Clone, Copy, PartialEq, Eq)]
 #[xml(scalar)]
 pub enum RelationshipType {
+    /// Represents a thumbnail part in the package.
     #[xml(
         rename = "http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail"
     )]
     Thumbnail,
+
+    /// Represents a model part in the package.
     #[xml(rename = "http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel")]
     Model,
 }
