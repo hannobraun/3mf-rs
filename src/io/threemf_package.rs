@@ -96,7 +96,7 @@ impl ThreemfPackage {
 
                     if file.is_file() {
                         if let Some(path) = file.enclosed_name() {
-                            if Some(OsStr::new("rels")) == path.extension()
+                            if Some(OsStr::new(rels_ext)) == path.extension()
                                 && path != PathBuf::from(root_rels_filename)
                             {
                                 match path.to_str() {
@@ -300,6 +300,7 @@ pub mod tests {
 
                 assert!(threemf.sub_models.contains_key("/3D/midway.model"));
 
+                assert!(threemf.relationships.contains_key("_rels/.rels"));
                 assert!(threemf
                     .relationships
                     .contains_key("/3D/_rels/3dmodel.model.rels"));
