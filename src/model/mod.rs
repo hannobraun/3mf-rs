@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[serde(rename = "@xmlns", default)]
     pub xmlns: String,
+    #[serde(rename = "@xmlns:m", skip_serializing_if = "Option::is_none")]
+    pub xmlns_m: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub metadata: Vec<Metadata>,
     pub resources: Resources,
@@ -40,11 +42,32 @@ pub struct Metadata {
 pub struct Resources {
     #[serde(default)]
     pub object: Vec<Object>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub basematerials: Option<()>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        rename = "m:basematerials"
+    )]
+    pub basematerials: Option<Vec<BaseMaterials>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename = "m:basematerials")]
+pub struct BaseMaterials {
+    #[serde(rename = "@id")]
+    pub id: usize,
+    #[serde(rename = "m:base")]
+    pub base: Vec<Base>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Base {
+    #[serde(rename = "@name")]
+    pub name: String,
+    #[serde(rename = "@displaycolor")]
+    pub displaycolor: String,
+}
+
+#[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "lowercase")]
 pub struct Object {
     #[serde(rename = "@id")]
@@ -55,6 +78,8 @@ pub struct Object {
     pub name: Option<String>,
     #[serde(rename = "@pid", skip_serializing_if = "Option::is_none")]
     pub pid: Option<usize>,
+    #[serde(rename = "@pindex", skip_serializing_if = "Option::is_none")]
+    pub pindex: Option<usize>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mesh: Option<Mesh>,
@@ -95,6 +120,9 @@ impl Default for Model {
     fn default() -> Self {
         Self {
             xmlns: "http://schemas.microsoft.com/3dmanufacturing/core/2015/02".to_owned(),
+            xmlns_m: Some(
+                "http://schemas.microsoft.com/3dmanufacturing/material/2015/02".to_owned(),
+            ),
             metadata: Vec::new(),
             resources: Resources::default(),
             build: Build::default(),
@@ -116,6 +144,7 @@ impl From<Mesh> for Model {
             partnumber: None,
             name: None,
             pid: None,
+            pindex: None,
             mesh: Some(mesh),
             components: None,
         };
