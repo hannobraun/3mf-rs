@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.8.0 (2026-03-05)
+
+- Update dependencies ([#66], [#67], [#68], [#70], [#72], [#74], [#75], [#76])
+- **Breaking change:** Add support for base materials and colors ([#71])
+
+[#66]: https://github.com/hannobraun/3mf-rs/pull/66
+[#67]: https://github.com/hannobraun/3mf-rs/pull/67
+[#68]: https://github.com/hannobraun/3mf-rs/pull/68
+[#70]: https://github.com/hannobraun/3mf-rs/pull/70
+[#71]: https://github.com/hannobraun/3mf-rs/pull/71
+[#72]: https://github.com/hannobraun/3mf-rs/pull/72
+[#74]: https://github.com/hannobraun/3mf-rs/pull/74
+[#75]: https://github.com/hannobraun/3mf-rs/pull/75
+[#76]: https://github.com/hannobraun/3mf-rs/pull/76
+
 ## v0.7.0 (2025-01-31)
 
 - Update dependencies ([#58])
