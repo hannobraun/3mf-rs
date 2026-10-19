@@ -14,7 +14,7 @@ pub fn read<R: Read + io::Seek>(reader: R) -> Result<Vec<Model>, Error> {
 
     for i in 0..zip.len() {
         let file = zip.by_index(i)?;
-        if file.name().ends_with(".model") {
+        if file.name()?.ends_with(".model") {
             let mut de = Deserializer::from_reader(BufReader::new(file));
             models.push(Model::deserialize(&mut de)?);
         }
