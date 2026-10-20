@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.8.1 (2026-10-20)
+
+- Update dependencies ([#78], [#80], [#81], [#84])
+
+[#78]: https://github.com/hannobraun/3mf-rs/pull/78
+[#80]: https://github.com/hannobraun/3mf-rs/pull/80
+[#81]: https://github.com/hannobraun/3mf-rs/pull/81
+[#84]: https://github.com/hannobraun/3mf-rs/pull/84
+
 ## v0.8.0 (2026-03-05)
 
 - Update dependencies ([#66], [#67], [#68], [#70], [#72], [#74], [#75], [#76])
